@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(to right, violet, indigo, blue, green, yellow, orange, red);
+    }
+    h1{
+
+        position: relative;
+color:white;
+text-shadow: 2px 2px black;
+left:70px;
+
+ -webkit-animation: anime 10s infinite alternate;
+
+
+    }
+
+
+
+
+    @-webkit-keyframes anime
+    {
+       0%
+       {
+         color:red;
+        
+       }
+
+       10%
+       {
+         color:blue;
+        
+       }
+       20%
+       {
+         color:greenyellow;
+        
+       }
+       30%
+       {
+         color:yellow;
+       
+       }
+       40%
+       {
+         color: #c01212;;
+        
+       }
+       50%
+       {
+         color:#32cd32;
+        
+       }
+       60%
+       {
+         color:blueviolet;
+        
+       }
+       70%
+       {
+         color:skyblue;
+        
+       }
+       80%
+       {
+         color:coral;
+        
+       }
+       90%
+       {
+         color:white;
+        
+       }
+       100%
+       {
+        color:red;
+       }
+
+    }
+
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 10px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid white;
+      cursor: pointer;
+      transition: background 0.3s ease-in-out;
+    }
+
+    .cell:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    #result {
+      position: relative;
+      left:120px;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+
+    #play-again {
+        position: relative;
+        left:115px;
+      margin-top: 10px;
+      font-size: 16px;
+      
+      background: black;
+      color: white;
+      padding: 5px 10px;
+      cursor: pointer;
+
+      -webkit-animation: anime 10s infinite alternate;
+    }
+
+    #play-again:hover
+    {
+
+        background-color: white;
+        color:red;
+    }
+  </style>
+</head>
+<div>
+    <h1>TIC TAC TOE</h1>
+  <div id="board"></div>
+  <div id="result"></div>
+ <div> <button id="play-again">Play Again</button></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const board = document.getElementById("board");
+      const cells = [];
+      const resultDisplay = document.getElementById("result");
+      const playAgainButton = document.getElementById("play-again");
+
+      let currentPlayer = "X";
+      let gameOver = false;
+      let againstComputer = true;
+
+     
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.index = i;
+        cells.push(cell);
+        board.appendChild(cell);
+      }
+
+      board.addEventListener("click", handleCellClick);
+
+      
+      playAgainButton.addEventListener("click", resetGame);
+
+      function handleCellClick(event) {
+        if (gameOver) return;
+
+        const clickedCell = event.target;
+        const index = clickedCell.dataset.index;
+
+        if (!cells[index].textContent) {
+          cells[index].textContent = currentPlayer;
+          cells[index].style.background = getRandomRainbowColor();
+          checkWinner();
+          if (!gameOver) {
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            if (againstComputer && currentPlayer === "O") {
+              
+              setTimeout(makeComputerMove, 500);
+            }
+          }
+        }
+      }
+
+      function checkWinner() {
+        const winningCombos = [
+          [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+          [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+          [0, 4, 8], [2, 4, 6]             
+        ];
+
+        for (const combo of winningCombos) {
+          const [a, b, c] = combo;
+          if (cells[a].textContent && cells[a].textContent === cells[b].textContent && cells[a].textContent === cells[c].textContent) {
+            cells[a].style.background = cells[b].style.background = cells[c].style.background = "gold";
+            gameOver = true;
+            displayResult(`${cells[a].textContent} wins!`);
+            break;
+          }
+        }
+
+        if (!cells.some(cell => !cell.textContent)) {
+
+          gameOver = true;
+          displayResult("It's a tie!");
+        }
+
+        if (gameOver) {
+          playAgainButton.style.display = "block";
+        }
+      }
+
+      function makeComputerMove() {
+        if (!gameOver && againstComputer) {
+          const emptyCells = cells.filter(cell => !cell.textContent);
+          if (emptyCells.length > 0) {
+            const randomIndex = Math.floor(Math.random() * emptyCells.length);
+            const computerMove = emptyCells[randomIndex];
+            computerMove.textContent = currentPlayer;
+            computerMove.style.background = getRandomRainbowColor();
+            checkWinner();
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+          }
+        }
+      }
+
+      function displayResult(message) {
+        resultDisplay.textContent = message;
+      }
+
+      function resetGame() {
+       
+        cells.forEach(cell => {
+          cell.textContent = "";
+          cell.style.background = "rgba(0, 0, 0, 0.7)";
+        });
+
+      
+        currentPlayer = "X";
+        gameOver = false;
+        resultDisplay.textContent = "";
+        playAgainButton.style.display = "none";
+
+        if (againstComputer && currentPlayer === "O") {
+
+          setTimeout(makeComputerMove, 500);
+        }
+      }
+
+      function getRandomRainbowColor() {
+        const letters = "0123456789ABCDEF";
+        let color = "#";
+        for (let i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
+    });
+  </script>
+</body>
+</html>
